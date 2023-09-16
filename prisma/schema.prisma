@@ -1,0 +1,211 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstName   String
+  lastName    String
+  password    String
+  email       String  @unique
+  phoneNumber String  @unique
+  isActive    Boolean @default(true)
+
+  // In the future this will work to create routes for orders delivery
+  // based on the address of the user and the address of the client
+  address Address?
+
+  clients Client[]
+
+  // Auth.js
+  accounts      Account[]
+  sessions      Session[]
+  emailVerified DateTime?
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  firstName   String
+  lastName    String
+  email       String?  @unique
+  phoneNumber String   @unique
+  address     Address?
+  orders      Order[]
+}
+
+model Address {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  streetName   String
+  streetNumber String
+  neighborhood String
+  city         String
+  state        String
+  country      String
+  postalCode   String
+  isActive     Boolean @default(true)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId String @unique
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  image       String
+  description String
+
+  products Product[]
+}
+
+enum SupplyUnitType {
+  KG
+  G
+  MG
+  L
+  ML
+  UN
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  description String
+  imageURLs   String[]
+  inStock     Int      @default(0)
+  price       Float
+
+  // Category that this product belongs to
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+
+  // Orders that have this product
+  inOrders OrderItem[]
+
+  // Supplies used to make this product
+  suppliesUsed SupplyUsage[]
+}
+
+model Supply {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  brand       String?
+  inStock     Float          @default(0)
+  unit        SupplyUnitType
+  description String?
+  price       Float?
+
+  suppliesUsed SupplyUsage[]
+}
+
+model SupplyUsage {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  supply    Supply  @relation(fields: [supplyId], references: [id])
+  supplyId  String
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @unique
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  total      Float
+  status     OrderStatus @default(PENDING)
+  client     Client      @relation(fields: [clientId], references: [id])
+  clientId   String
+  payedTotal Float
+  payedAt    DateTime?
+
+  orderItems OrderItem[]
+}
+
+// Auth.js
+model Account {
+  id                       String  @id @default(uuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  refresh_token_expires_in Int?
+  access_token             String? @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

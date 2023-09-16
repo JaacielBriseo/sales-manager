@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  sales-manager-db:
+    image: postgres:15.3
+    container_name: sales-manager-db
+    restart: 'no'
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
