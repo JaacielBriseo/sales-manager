@@ -58,6 +58,11 @@ module.exports = {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
 				},
+				lighOrange: '#ff8f70',
+				watermelon: '#ff3d54',
+			},
+			backgroundImage: {
+				mobilePattern: 'url(/bg-pattern-intro-mobile.svg)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
