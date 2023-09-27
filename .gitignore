@@ -10,6 +10,7 @@
 
 /postgres
 .env
+.env.development
 
 # next.js
 /.next/

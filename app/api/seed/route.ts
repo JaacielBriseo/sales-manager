@@ -1,9 +1,10 @@
+import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
+
 import prismadb from '@/lib/prisma';
 import { bcryptUtils } from '@/lib/services/bcrypt';
-import { Prisma } from '@prisma/client';
-import { NextResponse, NextRequest } from 'next/server';
 
-export async function GET(_: Request) {
+export async function POST(_: Request) {
 	if (process.env.NODE_ENV === 'production') {
 		return NextResponse.json(
 			{
