@@ -23,10 +23,12 @@ model User {
   isActive    Boolean @default(true)
 
   // In the future this will work to create routes for orders delivery
-  // based on the address of the user and the address of the client
+  // based on the address of the user and the address of the customer
   address Address?
 
-  clients Client[]
+  customers Customer[]
+
+  products Product[]
 
   // Auth.js
   accounts      Account[]
@@ -34,7 +36,7 @@ model User {
   emailVerified DateTime?
 }
 
-model Client {
+model Customer {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -67,8 +69,8 @@ model Address {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 
-  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  clientId String @unique
+  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String @unique
 }
 
 enum OrderStatus {
@@ -118,6 +120,10 @@ model Product {
 
   // Supplies used to make this product
   suppliesUsed SupplyUsage[]
+
+  // User that created this product
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 }
 
 model Supply {
@@ -152,6 +158,7 @@ model OrderItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  quantity  Int
   order     Order   @relation(fields: [orderId], references: [id])
   orderId   String
   product   Product @relation(fields: [productId], references: [id])
@@ -165,8 +172,8 @@ model Order {
 
   total      Float
   status     OrderStatus @default(PENDING)
-  client     Client      @relation(fields: [clientId], references: [id])
-  clientId   String
+  customer     Customer @relation(fields: [customerId], references: [id])
+  customerId   String
   payedTotal Float
   payedAt    DateTime?
 

@@ -1,8 +1,8 @@
 const DashboardRootPage = () =>  {
 	return (
-		<div>
+		<main>
 			<h1>Hello DashboardRoot Page</h1>
-		</div>
+		</main>
 	);
 }
 

@@ -9,9 +9,9 @@
 /coverage
 
 /postgres
-.env
-.env.development
-
+/postgres_dev
+.env*
+/prisma/migrations
 # next.js
 /.next/
 /out/
