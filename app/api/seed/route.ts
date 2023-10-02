@@ -10,18 +10,46 @@ export async function POST(_: Request) {
 			{
 				message: 'Cannot seed in production',
 			},
-			{ status: 400 }
+			{ status: 400 },
 		);
 	}
 
+	await prismadb.product.deleteMany({});
 	await prismadb.user.deleteMany({});
-	await prismadb.user.createMany({ data: seed_users });
+
+	const user = await prismadb.user.create({ data: seed_users[0]! });
+
+	await prismadb.product.createMany({
+		data: [
+			{
+				userId: user.id,
+				name: 'Galletas de chocolate',
+				description: 'Galletas de chocolate con chispas de chocolate',
+				price: 100,
+				tags: ['chocolate', 'galletas', 'reposteria'],
+			},
+			{
+				userId: user.id,
+				name: 'Galletas de vainilla',
+				description: 'Galletas de vainilla con chispas de chocolate',
+				price: 100,
+				tags: ['vainilla', 'galletas', 'reposteria'],
+			},
+			{
+				userId: user.id,
+				name: 'Galletas de fresa',
+				description: 'Galletas de fresa con chispas de chocolate',
+				price: 100,
+				tags: ['fresa', 'galletas', 'reposteria'],
+			},
+		],
+	});
 
 	return NextResponse.json(
 		{
 			message: 'Seed Success',
 		},
-		{ status: 200 }
+		{ status: 200 },
 	);
 }
 

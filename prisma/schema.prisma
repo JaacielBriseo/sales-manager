@@ -69,26 +69,14 @@ model Address {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 
-  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId String @unique
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String   @unique
 }
 
 enum OrderStatus {
   PENDING
   COMPLETED
   CANCELLED
-}
-
-model Category {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  name        String
-  image       String
-  description String
-
-  products Product[]
 }
 
 enum SupplyUnitType {
@@ -110,10 +98,7 @@ model Product {
   imageURLs   String[]
   inStock     Int      @default(0)
   price       Float
-
-  // Category that this product belongs to
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId String
+  tags        String[]
 
   // Orders that have this product
   inOrders OrderItem[]
@@ -172,8 +157,8 @@ model Order {
 
   total      Float
   status     OrderStatus @default(PENDING)
-  customer     Customer @relation(fields: [customerId], references: [id])
-  customerId   String
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  customerId String
   payedTotal Float
   payedAt    DateTime?
 
