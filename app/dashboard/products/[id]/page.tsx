@@ -1,11 +1,13 @@
 import { redirect } from 'next/navigation';
+
 import prismadb from '@/lib/prisma';
 import { getUserSession } from '@/lib/user-session';
-import { formAction } from './_actions';
-import { Input } from '@/components/ui/input';
+import { updateOrCreateProduct } from '@/actions/products';
+
+import { SubmitButton } from './_components/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { SubmitButton } from './_components/submit-button';
+import { Input } from '@/components/ui/input';
 
 interface GetProductArgs {
 	productId: string;
@@ -32,9 +34,6 @@ interface Props {
 	params: { id: string };
 }
 
-// Opt out of caching for all data requests in the route segment
-export const dynamic = 'force-dynamic';
-
 const DashboardProductByIdPage: React.FC<Props> = async ({ params }) => {
 	const session = await getUserSession();
 	if (!session) {
@@ -56,7 +55,12 @@ const DashboardProductByIdPage: React.FC<Props> = async ({ params }) => {
 			<form
 				action={async (formData) => {
 					'use server';
-					await formAction({ formData, userId, productId: params.id });
+					await updateOrCreateProduct({
+						formData,
+						userId,
+						productId: params.id,
+					});
+					redirect(`/dashboard/products`);
 				}}
 			>
 				<div className='grid grid-cols-2 gap-5'>

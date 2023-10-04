@@ -4,8 +4,10 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ColumnHeader } from './column-header';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { type Product } from '@prisma/client';
 import { TableRowActions } from './table-row-actions';
+import { currencyFormatter } from '@/lib/utils';
+
+import { type Product } from '@prisma/client';
 type ProductData = Pick<
 	Product,
 	'id' | 'name' | 'price' | 'inStock' | 'tags' | 'description'
@@ -82,6 +84,10 @@ export const columns: ColumnDef<ProductData>[] = [
 				/>
 			);
 		},
+		cell: ({ row }) => {
+			const { price } = row.original;
+			return <p>{currencyFormatter(price)}</p>;
+		},
 	},
 	{
 		accessorKey: 'inStock',
@@ -93,6 +99,23 @@ export const columns: ColumnDef<ProductData>[] = [
 				/>
 			);
 		},
+		cell: ({ row }) => {
+			const { inStock } = row.original;
+			return (
+				<p>
+					<span
+						className={`h-3 w-3 rounded-full inline-block mx-1 ${
+							inStock <= 4
+								? 'bg-destructive'
+								: inStock >= 5 && inStock <= 10
+								? 'bg-warning'
+								: 'bg-success'
+						}`}
+					/>
+					{inStock}{' '}
+				</p>
+			);
+		},
 	},
 	{
 		accessorKey: 'tags',
@@ -102,6 +125,21 @@ export const columns: ColumnDef<ProductData>[] = [
 					column={column}
 					title='Tags'
 				/>
+			);
+		},
+		cell: ({ row }) => {
+			const { tags } = row.original;
+			return (
+				<div className='flex flex-wrap gap-1'>
+					{tags.map((tag) => (
+						<span
+							key={tag}
+							className='px-2 py-1 text-xs font-bold tracking-wide text-foreground capitalize bg-secondary rounded-full'
+						>
+							{tag}
+						</span>
+					))}
+				</div>
 			);
 		},
 	},

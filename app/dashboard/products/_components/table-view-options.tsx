@@ -1,7 +1,7 @@
 'use client';
+import { SlidersHorizontal } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
-import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -10,7 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MailX, SlidersHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TableViewOptionsProps<TData> {
 	table: Table<TData>;

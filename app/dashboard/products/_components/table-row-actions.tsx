@@ -1,5 +1,5 @@
-'use client';
-import { MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
+import { FileEdit, MoreHorizontal } from 'lucide-react';
 
 import {
 	DropdownMenu,
@@ -9,16 +9,13 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { DeleteProductAlert } from '@/components/dashboard/products/delete-product-alert';
 
 interface Props {
 	id: string;
 }
 
 export function TableRowActions({ id }: Props) {
-	const onDelete = () => {
-		console.log('delete', id);
-	};
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -35,10 +32,18 @@ export function TableRowActions({ id }: Props) {
 				className='w-[160px]'
 			>
 				<DropdownMenuItem>
-					<Link href={`/dashboard/products/${id}`}>Edit</Link>
+					<Link
+						href={`/dashboard/products/${id}`}
+						className='flex items-center gap-1'
+					>
+						<FileEdit />
+						Edit
+					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
+				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+					<DeleteProductAlert productId={id} />
+				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -23,24 +23,30 @@ export async function POST(_: Request) {
 		data: [
 			{
 				userId: user.id,
-				name: 'Galletas de chocolate',
-				description: 'Galletas de chocolate con chispas de chocolate',
-				price: 100,
+				name: 'Galleta de chocolate',
+				description: 'Galleta gigante de chocolate con chispas de chocolate',
+				price: 50,
 				tags: ['chocolate', 'galletas', 'reposteria'],
+				inStock: 2,
 			},
 			{
 				userId: user.id,
-				name: 'Galletas de vainilla',
-				description: 'Galletas de vainilla con chispas de chocolate',
-				price: 100,
-				tags: ['vainilla', 'galletas', 'reposteria'],
+				name: 'Galletas decoradas',
+				description:
+					'Paquete de 6 galletas decoradas con el tema que el cliente desee',
+				price: 150,
+				tags: ['decoración', 'galletas', 'reposteria'],
+				inStock: 10,
 			},
 			{
 				userId: user.id,
-				name: 'Galletas de fresa',
-				description: 'Galletas de fresa con chispas de chocolate',
-				price: 100,
-				tags: ['fresa', 'galletas', 'reposteria'],
+				name: 'Caja de Adviento Disney',
+				description:
+					'Caja de adviento con temática de Disney, incluye 24 galletas decoradas',
+				price: 999,
+				tags: ['disney', 'galletas', 'reposteria', 'decoración'],
+				inStock: 30,
+				
 			},
 		],
 	});

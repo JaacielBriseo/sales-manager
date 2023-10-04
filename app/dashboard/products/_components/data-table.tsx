@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 
 import {
 	ColumnDef,
@@ -7,8 +8,6 @@ import {
 	VisibilityState,
 	flexRender,
 	getCoreRowModel,
-	getFacetedRowModel,
-	getFacetedUniqueValues,
 	getFilteredRowModel,
 	getPaginationRowModel,
 	getSortedRowModel,
@@ -24,7 +23,6 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { TablePaginationControllers } from './table-pagination-controllers';
-import { useState } from 'react';
 import { TableToolbar } from './table-toolbar';
 
 interface DataTableProps<TData, TValue> {
@@ -37,7 +35,9 @@ export function DataTable<TData, TValue>({
 	data,
 }: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = useState({});
-	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+		id: false,
+	});
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const table = useReactTable({
@@ -61,7 +61,7 @@ export function DataTable<TData, TValue>({
 	});
 
 	return (
-		<div className='space-y-4'>
+		<div className='space-y-4 mb-5'>
 			<TableToolbar
 				table={table}
 				filterKey='description'
