@@ -36,6 +36,33 @@
 //   }
 // }
 
-Cypress.Commands.add('dataCy',(value)=>{
-  return cy.get(`[data-cy=${value}]`)
-})
+Cypress.Commands.add('dataCy', (value) => {
+	return cy.get(`[data-cy=${value}]`);
+});
+
+Cypress.Commands.add('login', (email, password) => {
+	cy.session(
+		email,
+		() => {
+			cy.visit('/auth/login');
+			cy.dataCy('email-input').type(email);
+			cy.dataCy('password-input').type(password);
+			cy.get('button[type=submit]').click();
+			cy.intercept('http://localhost:3001/api/auth/callback/credentials?').as(
+				'auth-completed',
+			);
+
+			cy.wait('@auth-completed');
+			cy.dataCy('toaster')
+				.should('contain.text', 'Success')
+				.and('have.class', 'success');
+			cy.getCookie('next-auth.session-token').should('exist');
+			cy.url().should('include', '/dashboard');
+		},
+		{
+			validate: () => {
+				cy.getCookie('next-auth.session-token').should('exist');
+			},
+		},
+	);
+});

@@ -18,6 +18,7 @@ const getProducts = async (userId: string) => {
 			inStock: true,
 			tags: true,
 			description: true,
+			createdAt: true,
 		},
 	});
 };

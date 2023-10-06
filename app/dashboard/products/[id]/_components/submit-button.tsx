@@ -8,6 +8,7 @@ export const SubmitButton = () => {
 
 	return (
 		<Button
+			data-cy='submit-button'
 			type='submit'
 			aria-disabled={pending}
 		>

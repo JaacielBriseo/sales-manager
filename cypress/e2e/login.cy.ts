@@ -1,6 +1,6 @@
 describe('Login', () => {
 	beforeEach(() => {
-		cy.request('/api/seed');
+		cy.request('POST','/api/seed');
 		cy.visit('/auth/login');
 	});
 	it('Login Successfully', () => {
@@ -10,7 +10,7 @@ describe('Login', () => {
 			cy.dataCy('password-input').type(password);
 			cy.get('button[type=submit]').click();
 		});
-		cy.intercept('http://localhost:3000/api/auth/callback/credentials?').as(
+		cy.intercept('http://localhost:3001/api/auth/callback/credentials?').as(
 			'auth-completed',
 		);
 
@@ -28,7 +28,7 @@ describe('Login', () => {
 			cy.dataCy('password-input').type(password + 'wrong');
 			cy.get('button[type=submit]').click();
 		});
-		cy.intercept('http://localhost:3000/api/auth/callback/credentials?').as(
+		cy.intercept('http://localhost:3001/api/auth/callback/credentials?').as(
 			'auth-completed',
 		);
 

@@ -6,11 +6,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { TableRowActions } from './table-row-actions';
 import { currencyFormatter } from '@/lib/utils';
+import { formatToDMY } from '@/lib/services/date-fns';
 
 import { type Product } from '@prisma/client';
 type ProductData = Pick<
 	Product,
-	'id' | 'name' | 'price' | 'inStock' | 'tags' | 'description'
+	'id' | 'name' | 'price' | 'inStock' | 'tags' | 'description' | 'createdAt'
 >;
 
 export const columns: ColumnDef<ProductData>[] = [
@@ -21,6 +22,7 @@ export const columns: ColumnDef<ProductData>[] = [
 				checked={table.getIsAllPageRowsSelected()}
 				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
 				aria-label='Select all'
+				data-cy='select-all-rows-checkbox'
 				className='translate-y-[2px]'
 			/>
 		),
@@ -34,6 +36,24 @@ export const columns: ColumnDef<ProductData>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
+	},
+	{
+		accessorKey:'Created At',
+		id:'createdAt',
+		header: ({ column }) => {
+			return (
+				<ColumnHeader
+					column={column}
+					title='Created At'
+				/>
+			);
+		},
+		cell: ({ row }) => {
+			const { createdAt } = row.original;
+			return <p className='truncate w-20'>{formatToDMY(createdAt)}</p>;
+		},
+		enableHiding: true,
+		enableSorting: true,
 	},
 	{
 		accessorKey: 'id',

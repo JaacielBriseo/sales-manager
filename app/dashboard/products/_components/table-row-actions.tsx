@@ -18,7 +18,10 @@ interface Props {
 export function TableRowActions({ id }: Props) {
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
+			<DropdownMenuTrigger
+				data-cy='table-row-actions-button'
+				asChild
+			>
 				<Button
 					variant='ghost'
 					className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'
@@ -33,6 +36,7 @@ export function TableRowActions({ id }: Props) {
 			>
 				<DropdownMenuItem>
 					<Link
+						data-cy='table-row-action-edit-link'
 						href={`/dashboard/products/${id}`}
 						className='flex items-center gap-1'
 					>

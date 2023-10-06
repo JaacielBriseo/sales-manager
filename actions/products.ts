@@ -63,7 +63,7 @@ export const updateOrCreateProduct = async (args: UpsertProductArgs) => {
 	}
 };
 
-export const deleteManyProducts = async (_: any, data: FormData) => {
+export const deleteManyProducts = async (data: FormData) => {
 	try {
 		const session = await getUserSession();
 

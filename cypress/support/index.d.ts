@@ -8,5 +8,6 @@
 declare namespace Cypress {
 	interface Chainable {
 		dataCy(value: string): Chainable<JQuery<Element>>;
+		login(email: string, password: string): Chainable<Element>;
 	}
 }

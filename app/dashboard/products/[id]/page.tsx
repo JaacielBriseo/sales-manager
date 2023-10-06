@@ -67,8 +67,10 @@ const DashboardProductByIdPage: React.FC<Props> = async ({ params }) => {
 					<div className='flex flex-col gap-3'>
 						<Label htmlFor='name'>Name</Label>
 						<Input
-							type='text'
+							id='name'
 							name='name'
+							type='text'
+							data-cy='nameInput'
 							defaultValue={product?.name}
 						/>
 					</div>
@@ -76,31 +78,39 @@ const DashboardProductByIdPage: React.FC<Props> = async ({ params }) => {
 					<div className='flex flex-col gap-3'>
 						<Label htmlFor='price'>Price</Label>
 						<Input
-							type='number'
+							id='price'
 							name='price'
+							type='number'
+							data-cy='priceInput'
 							defaultValue={product?.price}
 						/>
 					</div>
 					<div className='flex flex-col gap-3'>
 						<Label htmlFor='inStock'>In Stock</Label>
 						<Input
-							type='number'
+							id='inStock'
 							name='inStock'
+							type='number'
+							data-cy='inStockInput'
 							defaultValue={product?.inStock}
 						/>
 					</div>
 					<div className='flex flex-col gap-3'>
 						<Label htmlFor='tags'>Tags</Label>
 						<Input
-							type='text'
+							id='tags'
 							name='tags'
+							type='text'
+							data-cy='tagsInput'
 							defaultValue={product?.tags.join(', ')}
 						/>
 					</div>
 					<div className='flex flex-col gap-3 col-span-2'>
 						<Label htmlFor='description'>Description</Label>
 						<Textarea
+							id='description'
 							name='description'
+							data-cy='descriptionTextarea'
 							defaultValue={product?.description}
 						/>
 					</div>
