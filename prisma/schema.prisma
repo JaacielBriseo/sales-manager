@@ -30,6 +30,8 @@ model User {
 
   products Product[]
 
+  orders Order[]
+
   // Auth.js
   accounts      Account[]
   sessions      Session[]
@@ -50,6 +52,7 @@ model Customer {
   phoneNumber String   @unique
   address     Address?
   orders      Order[]
+  isActive    Boolean  @default(true)
 }
 
 model Address {
@@ -66,11 +69,14 @@ model Address {
   postalCode   String
   isActive     Boolean @default(true)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique
 
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId String   @unique
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String?   @unique
+
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String? @unique
 }
 
 enum OrderStatus {
@@ -147,7 +153,18 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id])
   orderId   String
   product   Product @relation(fields: [productId], references: [id])
-  productId String  @unique
+  productId String
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
+
+enum DeliveryMethod {
+  PICKUP
+  DELIVERY
 }
 
 model Order {
@@ -155,14 +172,31 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  total      Float
-  status     OrderStatus @default(PENDING)
-  customer   Customer    @relation(fields: [customerId], references: [id])
-  customerId String
-  payedTotal Float
-  payedAt    DateTime?
+  // Status of the order
+  // PENDING: Order has been created but not totally payed or delivered
+  // COMPLETED: Order has been payed and delivered
+  // CANCELLED: Order has been cancelled
+  status      OrderStatus @default(PENDING)
+  // Total price of the order
+  total       Float
+  // Total amount the customer has payed
+  payedTotal  Float
+  // Date the customer payed 100% of the order 
+  payedAt     DateTime?
+  // Date the order was delivered
+  deliveredAt DateTime?
+  // Deadline for the order to be delivered
+  deadline    DateTime?
 
-  orderItems OrderItem[]
+  deliveryAddress Address?
+  orderItems      OrderItem[]
+  paymentMethod   PaymentMethod
+  deliveryMethod  DeliveryMethod
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
 }
 
 // Auth.js
