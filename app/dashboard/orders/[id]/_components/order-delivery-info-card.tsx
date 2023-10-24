@@ -6,6 +6,7 @@ interface Props {
 	deliveryAddress?: string;
 	deliveredAt?: string;
 	deadline?: string;
+	note?: string;
 }
 
 export const OrderDeliveryInfoCard: React.FC<Props> = ({
@@ -13,6 +14,7 @@ export const OrderDeliveryInfoCard: React.FC<Props> = ({
 	deliveredAt,
 	deliveryAddress,
 	deadline,
+	note,
 }) => {
 	return (
 		<Card className='p-5 space-y-5'>
@@ -44,6 +46,13 @@ export const OrderDeliveryInfoCard: React.FC<Props> = ({
 						<span className='capitalize'>{deliveryMethod.toLowerCase()}</span>
 					</p>
 					{deliveryAddress && <p>Delivery address: {deliveryAddress}</p>}
+					{
+						note && (
+							<p className='italic'>
+								<span className='font-medium'>Note:</span> {note}
+							</p>
+						)
+					}
 				</div>
 			</CardContent>
 		</Card>

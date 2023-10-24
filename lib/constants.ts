@@ -1,6 +1,7 @@
+import { DeliveryMethod, OrderStatus, PaymentMethod } from '@prisma/client';
 import {
-  User2,
-  ChefHat,
+	User2,
+	ChefHat,
 	AlertCircle,
 	LayoutDashboard,
 	type LucideIcon,
@@ -34,3 +35,20 @@ export const dashboardRoutes: DashboardRoute[] = [
 		icon: AlertCircle,
 	},
 ];
+
+export const paymentMethodsTuple = [
+	PaymentMethod.CARD,
+	PaymentMethod.CASH,
+	PaymentMethod.TRANSFER,
+] as const;
+
+export const deliveryMethodsTuple = [
+	DeliveryMethod.PICKUP,
+	DeliveryMethod.DELIVERY,
+] as const;
+
+export const orderStatusTuple = [
+	OrderStatus.PENDING,
+	OrderStatus.CANCELLED,
+	OrderStatus.COMPLETED,
+] as const;

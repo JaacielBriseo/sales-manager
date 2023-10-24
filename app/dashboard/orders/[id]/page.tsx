@@ -55,6 +55,7 @@ const DashboardOrderByIdPage: React.FC<Props> = async ({ params }) => {
 		total,
 		id: orderId,
 		deliveryAddress,
+		note,
 	} = order;
 	const { firstName, lastName, phoneNumber, id: customerId } = customer;
 
@@ -73,6 +74,7 @@ const DashboardOrderByIdPage: React.FC<Props> = async ({ params }) => {
 			? formatAddress(deliveryAddress)
 			: undefined,
 		deliveredAt: deliveredAt ? formatToDMY(deliveredAt) : undefined,
+		note: note || undefined,
 	};
 
 	const transactionInformation = {

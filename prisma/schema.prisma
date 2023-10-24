@@ -187,6 +187,8 @@ model Order {
   deliveredAt DateTime?
   // Deadline for the order to be delivered
   deadline    DateTime?
+  // Note the customer can leave for the order
+  note String?
 
   deliveryAddress Address?
   orderItems      OrderItem[]
