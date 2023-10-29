@@ -52,3 +52,8 @@ export const orderStatusTuple = [
 	OrderStatus.CANCELLED,
 	OrderStatus.COMPLETED,
 ] as const;
+
+export const paginationConstants = {
+	perPage: 25,
+	page:1,
+} as const;

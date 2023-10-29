@@ -1,9 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
 	ColumnDef,
 	ColumnFiltersState,
+	PaginationState,
 	SortingState,
 	VisibilityState,
 	flexRender,
@@ -24,16 +25,82 @@ import {
 } from '@/components/ui/table';
 import { TablePaginationControllers } from './table-pagination-controllers';
 import { TableToolbar } from './table-toolbar';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
+	page: number;
+	perPage: number;
+	pageCount: number;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
+	page,
+	perPage,
+	pageCount,
 }: DataTableProps<TData, TValue>) {
+	// ----------------------------- Routing ---------------------------------- //
+	//? Handlers for pagination, sorting, filtering, etc. using search params
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
+	// Create a query string from search params
+	const createQueryString = useCallback(
+		(params: Record<string, string | number | null>) => {
+			const newSearchParams = new URLSearchParams(searchParams?.toString());
+
+			for (const [key, value] of Object.entries(params)) {
+				if (value === null) {
+					newSearchParams.delete(key);
+				} else {
+					newSearchParams.set(key, String(value));
+				}
+			}
+
+			return newSearchParams.toString();
+		},
+		[searchParams],
+	);
+
+	// Handle pagination
+	const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+		pageIndex: page - 1,
+		pageSize: perPage,
+	});
+
+	const pagination = useMemo(
+		() => ({
+			pageIndex,
+			pageSize,
+		}),
+		[pageIndex, pageSize],
+	);
+
+	useEffect(() => {
+		setPagination({
+			pageIndex: page - 1,
+			pageSize: perPage,
+		});
+	}, [page, perPage]);
+
+	useEffect(() => {
+		router.push(
+			`${pathname}?${createQueryString({
+				page: pageIndex + 1,
+				perPage: pageSize,
+			})}`,
+			{
+				scroll: false,
+			},
+		);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [pageIndex, pageSize]);
+	// ----------------------------- Table ---------------------------------- //
 	const [rowSelection, setRowSelection] = useState({});
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
 		id: false,
@@ -54,8 +121,10 @@ export function DataTable<TData, TValue>({
 			columnVisibility,
 			rowSelection,
 			columnFilters,
+			pagination,
 		},
 		enableRowSelection: true,
+		onPaginationChange: setPagination,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
@@ -64,6 +133,8 @@ export function DataTable<TData, TValue>({
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		manualPagination: true,
+		pageCount: pageCount ?? -1,
 	});
 
 	return (

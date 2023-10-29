@@ -5,12 +5,21 @@ import { getUserSession } from '@/lib/user-session';
 
 import { DataTable } from './_components/data-table';
 import { columns } from './_components/columns';
+import { QueryOptions } from '@/interfaces';
+import { dbQueryParamsSchema } from '@/lib/schemas/db-query-params';
 
-const getProducts = async (userId: string) => {
+const getProducts = async (userId: string, options?: QueryOptions) => {
 	return await prismadb.product.findMany({
 		where: {
 			userId,
 			isActive: true,
+			...(options?.query && {
+				OR: [
+					{ name: { contains: options.query, mode: 'insensitive' } },
+					{ description: { contains: options.query, mode: 'insensitive' } },
+					{ tags: { has: options.query } },
+				],
+			}),
 		},
 		select: {
 			id: true,
@@ -21,17 +30,30 @@ const getProducts = async (userId: string) => {
 			description: true,
 			createdAt: true,
 		},
+		...(options && {
+			skip: options.perPage * (options.page - 1),
+			take: options.perPage,
+		}),
 	});
 };
 
-const DashboardProductsPage = async () => {
+interface Props {
+	searchParams: { [key: string]: string | string[] | undefined };
+}
+const DashboardProductsPage = async ({ searchParams }: Props) => {
 	const session = await getUserSession();
 
 	if (!session) {
 		redirect('/auth/login');
 	}
 
-	const products = await getProducts(session.user.id);
+	const { page, perPage, query } = dbQueryParamsSchema.parse(searchParams);
+
+	const products = await getProducts(session.user.id, {
+		page: Number(page),
+		perPage: Number(perPage),
+		query,
+	});
 
 	return (
 		<div className='flex flex-col gap-5'>
@@ -42,6 +64,9 @@ const DashboardProductsPage = async () => {
 			<DataTable
 				columns={columns}
 				data={products}
+				page={page}
+				perPage={perPage}
+				pageCount={Math.ceil(products.length / perPage)}
 			/>
 		</div>
 	);

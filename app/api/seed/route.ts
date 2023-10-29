@@ -31,8 +31,12 @@ export async function POST(_: Request) {
 				},
 			});
 
+			const productsData = [
+				...seed_products.slice(1),
+				...createMassiveProducts(60),
+			];
 			await product.createMany({
-				data: seed_products.slice(1).map((product) => ({
+				data: productsData.map((product) => ({
 					...product,
 					userId: defaultUser.id,
 				})),
@@ -191,3 +195,19 @@ const seed_products = [
 		inStock: 10,
 	},
 ];
+
+const createMassiveProducts = (amount: number) => {
+	const products: typeof seed_products = [];
+
+	for (let i = 0; i < amount; i++) {
+		products.push({
+			name: `Galleta ${i}`,
+			description: `Galleta ${i}`,
+			price: 50,
+			tags: ['chocolate', 'galletas', 'reposteria'],
+			inStock: 2,
+		});
+	}
+
+	return products;
+};
