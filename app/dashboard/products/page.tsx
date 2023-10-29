@@ -10,6 +10,7 @@ const getProducts = async (userId: string) => {
 	return await prismadb.product.findMany({
 		where: {
 			userId,
+			isActive: true,
 		},
 		select: {
 			id: true,

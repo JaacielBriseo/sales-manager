@@ -1,7 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
-import { format } from 'date-fns';
+
 import prismadb from '@/lib/prisma';
+import { formatAddress } from '@/lib/utils';
 import { getUserSession } from '@/lib/user-session';
+import { formatToDMY } from '@/lib/services/date-fns';
+
 import { CustomerInfoCard } from '@/components/dashboard/customers/customer-info-card';
 import { CustomerOrdersDataTable } from '@/components/dashboard/customers/table/customers-data-table';
 import { customerOrdersDataColumns } from '@/components/dashboard/customers/table/customers-data-columns';
@@ -49,14 +52,12 @@ const DashboardCustomersByIdPage: React.FC<Props> = async ({ params }) => {
 	} = customer;
 
 	const fullName = firstName.concat(' ', lastName);
-	const fullAddress = address
-		? `${address.streetName} #${address.streetNumber}, ${address.neighborhood} ${address.postalCode},${address.city} ,${address.state} , ${address.country} `
-		: '';
+	const fullAddress = address ? formatAddress(address) : '';
 	return (
 		<div className='w-full flex flex-col gap-5'>
 			<section>
 				<CustomerInfoCard
-					createdAt={format(createdAt, 'yyyy-MM-dd')}
+					createdAt={formatToDMY(createdAt)}
 					email={email}
 					id={customer.id}
 					fullName={fullName}

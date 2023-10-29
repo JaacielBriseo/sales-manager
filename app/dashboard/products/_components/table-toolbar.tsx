@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { Table } from '@tanstack/react-table';
 import { PlusCircle, X } from 'lucide-react';
@@ -18,6 +19,7 @@ export function TableToolbar<TData>({
 	table,
 	filterKey,
 }: TableToolbarProps<TData>) {
+	const pathname = usePathname();
 	const isFiltered = table.getState().columnFilters.length > 0;
 	const selectedIds: string[] = table
 		.getFilteredSelectedRowModel()
@@ -57,7 +59,10 @@ export function TableToolbar<TData>({
 				>
 					<Link
 						data-cy='add-new-product'
-						href='/dashboard/products/new'
+						href={{
+							pathname: '/dashboard/products/create',
+							query: { from: pathname },
+						}}
 					>
 						Add new
 						<PlusCircle className='ml-2 h-4 w-4' />

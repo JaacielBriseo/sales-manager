@@ -3,7 +3,7 @@ import {
 	User2,
 	ChefHat,
 	AlertCircle,
-	LayoutDashboard,
+	ShoppingBasket,
 	type LucideIcon,
 } from 'lucide-react';
 
@@ -15,9 +15,9 @@ interface DashboardRoute {
 
 export const dashboardRoutes: DashboardRoute[] = [
 	{
-		path: '/dashboard/overview',
-		label: 'Overview',
-		icon: LayoutDashboard,
+		path: '/dashboard/supplies',
+		label: 'Supplies',
+		icon: ShoppingBasket,
 	},
 	{
 		path: '/dashboard/products',

@@ -106,6 +106,9 @@ model Product {
   price       Float
   tags        String[]
 
+  // Soft delete
+  isActive Boolean @default(true)
+
   // Orders that have this product
   inOrders OrderItem[]
 
@@ -130,6 +133,9 @@ model Supply {
   price       Float?
 
   suppliesUsed SupplyUsage[]
+
+  // Soft delete
+  isActive Boolean @default(true)
 }
 
 model SupplyUsage {
@@ -188,7 +194,7 @@ model Order {
   // Deadline for the order to be delivered
   deadline    DateTime?
   // Note the customer can leave for the order
-  note String?
+  note        String?
 
   deliveryAddress Address?
   orderItems      OrderItem[]

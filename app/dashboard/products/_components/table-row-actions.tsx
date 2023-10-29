@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileEdit, MoreHorizontal } from 'lucide-react';
+import { ArrowUpRightSquare, FileEdit, MoreHorizontal } from 'lucide-react';
 
 import {
 	DropdownMenu,
@@ -17,7 +17,7 @@ interface Props {
 
 export function TableRowActions({ id }: Props) {
 	return (
-		<DropdownMenu>
+		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger
 				data-cy='table-row-actions-button'
 				asChild
@@ -36,16 +36,30 @@ export function TableRowActions({ id }: Props) {
 			>
 				<DropdownMenuItem>
 					<Link
-						data-cy='table-row-action-edit-link'
+						data-cy='table-row-action-view-link'
 						href={`/dashboard/products/${id}`}
-						className='flex items-center gap-1'
+						className='flex items-center gap-1 w-full'
+					>
+						<ArrowUpRightSquare />
+						Details
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem>
+					<Link
+						data-cy='table-row-action-edit-link'
+						href={`/dashboard/products/${id}/update`}
+						className='flex items-center gap-1 w-full text-success'
 					>
 						<FileEdit />
 						Edit
 					</Link>
 				</DropdownMenuItem>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+				<DropdownMenuItem
+					onSelect={(e) => {
+						e.preventDefault();
+					}}
+				>
 					<DeleteProductAlert productId={id} />
 				</DropdownMenuItem>
 			</DropdownMenuContent>

@@ -17,7 +17,7 @@ interface Props {
 
 export function TableRowActions({ id }: Props) {
 	return (
-		<DropdownMenu>
+		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger
 				data-cy='table-row-actions-button'
 				asChild

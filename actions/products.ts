@@ -6,59 +6,52 @@ import { z } from 'zod';
 
 import { isErrorInstance } from '@/lib/type-guards';
 import { getUserSession } from '@/lib/user-session';
+import { buildLogger } from '@/lib/services/logger';
+import {
+	productSchema,
+	type ProductSchema as ProductSchemaType,
+} from '@/lib/schemas/products';
 
-const productSchema = z.object({
-	name: z.string(),
-	description: z.string(),
-	price: z.number(),
-	inStock: z.number(),
-	tags: z.array(z.string()),
-});
+const logger = buildLogger('[ProductsActions]');
 
 interface UpsertProductArgs {
-	formData: FormData;
-	userId: string;
 	productId?: string;
+	data: ProductSchemaType;
 }
-export const updateOrCreateProduct = async (args: UpsertProductArgs) => {
-	const { formData, userId, productId } = args;
+export const upsertProductAction = async (args: UpsertProductArgs) => {
+	const { data, productId } = args;
 
-	const data = {
-		name: formData.get('name'),
-		description: formData.get('description'),
-		price: Number(formData.get('price')),
-		inStock: Number(formData.get('inStock')),
-		tags:
-			formData
-				.get('tags')
-				?.toString()
-				.split(',')
-				.map((tag) => tag.trim().replaceAll(' ', '-')) ?? [],
-	};
+	const session = await getUserSession();
+
+	if (!session) {
+		return {
+			error: 'Not logged in',
+		};
+	}
+
+	const tags = data.tags.split(',').map((tag) => tag.trim());
 
 	try {
-		const parsedProduct = productSchema.safeParse(data);
-
-		if (!parsedProduct.success) {
-			throw new Error('Invalid product data');
-		}
-
 		await prismadb.product.upsert({
 			where: {
-				id: productId,
+				id: productId ?? '',
 			},
 			create: {
-				...parsedProduct.data,
-				userId,
+				...data,
+				tags,
+				userId: session.user.id,
 			},
-			update: parsedProduct.data,
+			update: { ...data, tags },
 		});
 
 		revalidatePath(`/dashboard/products`);
-	} catch (error) {
-		console.log(error);
 		return {
-			message: isErrorInstance(error) ? error.message : 'Something went wrong',
+			message: 'Product saved successfully',
+		};
+	} catch (error) {
+		logger.error(`[UpsertAction] - ${error}`);
+		return {
+			error: isErrorInstance(error) ? error.message : 'Something went wrong',
 		};
 	}
 };
@@ -77,12 +70,15 @@ export const deleteManyProducts = async (data: FormData) => {
 
 		if (!parse.success) throw new Error('Invalid product ids');
 
-		await prismadb.product.deleteMany({
+		await prismadb.product.updateMany({
 			where: {
 				userId: session.user.id,
 				id: {
 					in: parse.data,
 				},
+			},
+			data: {
+				isActive: false,
 			},
 		});
 
@@ -106,10 +102,13 @@ export const deleteProduct = async (data: FormData) => {
 
 		const productId = data.get('productId');
 
-		await prismadb.product.delete({
+		await prismadb.product.update({
 			where: {
 				userId: session.user.id,
 				id: productId?.toString(),
+			},
+			data: {
+				isActive: false,
 			},
 		});
 

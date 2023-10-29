@@ -115,7 +115,7 @@ export function DataTable<TData, TValue>({
 									colSpan={columns.length}
 									className='h-24 text-center'
 								>
-									No results.
+									You dont&apos;t have any products yet.
 								</TableCell>
 							</TableRow>
 						)}
