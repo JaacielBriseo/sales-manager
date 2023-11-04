@@ -11,7 +11,7 @@ import { formatToDMY } from '@/lib/services/date-fns';
 import { type Product } from '@prisma/client';
 type ProductData = Pick<
 	Product,
-	'id' | 'name' | 'price' | 'inStock' | 'tags' | 'description' | 'createdAt'
+	'id' | 'name' | 'price' | 'inStock' | 'tags' | 'shortDescription' | 'createdAt'
 >;
 
 export const columns: ColumnDef<ProductData>[] = [
@@ -84,7 +84,7 @@ export const columns: ColumnDef<ProductData>[] = [
 		enableSorting: true,
 	},
 	{
-		accessorKey: 'description',
+		accessorKey: 'shortDescription',
 		header: ({ column }) => {
 			return (
 				<ColumnHeader

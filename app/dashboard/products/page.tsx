@@ -16,7 +16,7 @@ const getProducts = async (userId: string, options?: QueryOptions) => {
 			...(options?.query && {
 				OR: [
 					{ name: { contains: options.query, mode: 'insensitive' } },
-					{ description: { contains: options.query, mode: 'insensitive' } },
+					{ shortDescription: { contains: options.query, mode: 'insensitive' } },
 					{ tags: { has: options.query } },
 				],
 			}),
@@ -27,7 +27,7 @@ const getProducts = async (userId: string, options?: QueryOptions) => {
 			price: true,
 			inStock: true,
 			tags: true,
-			description: true,
+			shortDescription: true,
 			createdAt: true,
 		},
 		...(options && {

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,55 +8,43 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  firstName   String
-  lastName    String
-  password    String
-  email       String  @unique
-  phoneNumber String  @unique
-  isActive    Boolean @default(true)
-
-  // In the future this will work to create routes for orders delivery
-  // based on the address of the user and the address of the customer
-  address Address?
-
-  customers Customer[]
-
-  products Product[]
-
-  orders Order[]
-
-  // Auth.js
-  accounts      Account[]
-  sessions      Session[]
+  id            String     @id @default(uuid())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  firstName     String
+  lastName      String
+  password      String
+  email         String     @unique
+  phoneNumber   String     @unique
+  isActive      Boolean    @default(true)
   emailVerified DateTime?
+  accounts      Account[]
+  address       Address?
+  customers     Customer[]
+  orders        Order[]
+  products      Product[]
+  sessions      Session[]
 }
 
 model Customer {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
   firstName   String
   lastName    String
   email       String?  @unique
   phoneNumber String   @unique
-  address     Address?
-  orders      Order[]
   isActive    Boolean  @default(true)
+  address     Address?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders      Order[]
 }
 
 model Address {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   streetName   String
   streetNumber String
   neighborhood String
@@ -67,163 +52,106 @@ model Address {
   state        String
   country      String
   postalCode   String
-  isActive     Boolean @default(true)
-
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String? @unique
-
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId String?   @unique
-
-  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String? @unique
-}
-
-enum OrderStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
-}
-
-enum SupplyUnitType {
-  KG
-  G
-  MG
-  L
-  ML
-  UN
+  isActive     Boolean   @default(true)
+  userId       String?   @unique
+  customerId   String?   @unique
+  orderId      String?   @unique
+  customer     Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  order        Order?    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  name        String
-  description String
-  imageURLs   String[]
-  inStock     Int      @default(0)
-  price       Float
-  tags        String[]
-
-  // Soft delete
-  isActive Boolean @default(true)
-
-  // Orders that have this product
-  inOrders OrderItem[]
-
-  // Supplies used to make this product
-  suppliesUsed SupplyUsage[]
-
-  // User that created this product
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  id               String        @id @default(uuid())
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  name             String
+  code             String
+  shortDescription String
+  longDescription  String?
+  imageURLs        String[]
+  inStock          Int           @default(0)
+  price            Float
+  tags             String[]
+  isActive         Boolean       @default(true)
+  userId           String
+  inOrders         OrderItem[]
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  suppliesUsed     SupplyUsage[]
 }
 
 model Supply {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  name        String
-  brand       String?
-  inStock     Float          @default(0)
-  unit        SupplyUnitType
-  description String?
-  price       Float?
-
+  id           String         @id @default(uuid())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  name         String
+  brand        String?
+  inStock      Float          @default(0)
+  unit         SupplyUnitType
+  description  String?
+  price        Float?
+  isActive     Boolean        @default(true)
   suppliesUsed SupplyUsage[]
-
-  // Soft delete
-  isActive Boolean @default(true)
 }
 
 model SupplyUsage {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   quantity  Int
-  product   Product @relation(fields: [productId], references: [id])
   productId String
-  supply    Supply  @relation(fields: [supplyId], references: [id])
   supplyId  String
+  product   Product  @relation(fields: [productId], references: [id])
+  supply    Supply   @relation(fields: [supplyId], references: [id])
 }
 
 model OrderItem {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   quantity  Int
-  order     Order   @relation(fields: [orderId], references: [id])
   orderId   String
-  product   Product @relation(fields: [productId], references: [id])
   productId String
-}
-
-enum PaymentMethod {
-  CASH
-  CARD
-  TRANSFER
-}
-
-enum DeliveryMethod {
-  PICKUP
-  DELIVERY
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model Order {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Status of the order
-  // PENDING: Order has been created but not totally payed or delivered
-  // COMPLETED: Order has been payed and delivered
-  // CANCELLED: Order has been cancelled
-  status      OrderStatus @default(PENDING)
-  // Total price of the order
-  total       Float
-  // Total amount the customer has payed
-  payedTotal  Float
-  // Date the customer payed 100% of the order 
-  payedAt     DateTime?
-  // Date the order was delivered
-  deliveredAt DateTime?
-  // Deadline for the order to be delivered
-  deadline    DateTime?
-  // Note the customer can leave for the order
-  note        String?
-
-  deliveryAddress Address?
-  orderItems      OrderItem[]
+  id              String         @id @default(uuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  status          OrderStatus    @default(PENDING)
+  total           Float
+  payedTotal      Float
+  payedAt         DateTime?
+  deliveredAt     DateTime?
+  deadline        DateTime?
+  note            String?
   paymentMethod   PaymentMethod
   deliveryMethod  DeliveryMethod
-
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
+  customerId      String
+  userId          String
+  deliveryAddress Address?
+  customer        Customer       @relation(fields: [customerId], references: [id])
+  user            User           @relation(fields: [userId], references: [id])
+  orderItems      OrderItem[]
 }
 
-// Auth.js
 model Account {
   id                       String  @id @default(uuid())
   userId                   String
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? @db.Text
+  refresh_token            String?
   refresh_token_expires_in Int?
-  access_token             String? @db.Text
+  access_token             String?
   expires_at               Int?
   token_type               String?
   scope                    String?
-  id_token                 String? @db.Text
+  id_token                 String?
   session_state            String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -242,4 +170,30 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum SupplyUnitType {
+  KG
+  G
+  MG
+  L
+  ML
+  UN
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
+
+enum DeliveryMethod {
+  PICKUP
+  DELIVERY
 }
