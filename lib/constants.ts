@@ -5,32 +5,38 @@ import {
 	AlertCircle,
 	ShoppingBasket,
 	type LucideIcon,
+	LayoutDashboard,
 } from 'lucide-react';
 
 interface DashboardRoute {
-	path: string;
+	href: string;
 	label: string;
 	icon: LucideIcon;
 }
 
 export const dashboardRoutes: DashboardRoute[] = [
 	{
-		path: '/dashboard/supplies',
+		href: '/dashboard/',
+		label: 'Overview',
+		icon: LayoutDashboard
+	},
+	{
+		href: '/dashboard/supplies',
 		label: 'Supplies',
 		icon: ShoppingBasket,
 	},
 	{
-		path: '/dashboard/products',
+		href: '/dashboard/products',
 		label: 'Products',
 		icon: ChefHat,
 	},
 	{
-		path: '/dashboard/customers',
+		href: '/dashboard/customers',
 		label: 'Customers',
 		icon: User2,
 	},
 	{
-		path: '/dashboard/orders',
+		href: '/dashboard/orders',
 		label: 'Orders',
 		icon: AlertCircle,
 	},

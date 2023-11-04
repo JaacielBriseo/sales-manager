@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react';
+import { DashboardSidebar } from './dashboard-sidebar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { DashboardRoutesList } from '@/components/dashboard/layout/dashboard-routes-list';
 
 export const NavDrawer = () => {
 	return (
@@ -9,7 +9,7 @@ export const NavDrawer = () => {
 				<Menu />
 			</SheetTrigger>
 			<SheetContent side='left'>
-				<DashboardRoutesList />
+				<DashboardSidebar />
 			</SheetContent>
 		</Sheet>
 	);
