@@ -1,10 +1,9 @@
-'use server';
+import prismadb from '@/lib/prisma';
+import { paginationConstants } from '@/lib/constants';
 
-import prismadb from '../prisma';
-import { PrismaClient } from '@prisma/client';
-import { paginationConstants } from '../constants';
-
-type ModelsWithFindMany = {
+// Types
+import { type Prisma, type PrismaClient } from '@prisma/client';
+type DbModelsWithFindMany = {
 	[K in keyof PrismaClient]: PrismaClient[K] extends {
 		findMany(args: any): any;
 	}
@@ -12,60 +11,99 @@ type ModelsWithFindMany = {
 		: never;
 }[keyof PrismaClient];
 
-type FindManyArgs<T extends ModelsWithFindMany> = Parameters<
-	PrismaClient[T]['findMany']
->[0];
+type DbArgs<T extends DbModelsWithFindMany> = Prisma.Args<
+	(typeof prismadb)[T],
+	'findMany'
+>;
 
-interface Pagination {
-	page: number;
-	perPage: number;
+interface DbSelectAndWhere<T extends DbModelsWithFindMany> {
+	select?: Prisma.Args<(typeof prismadb)[T], 'findMany'>['select'];
+	where?: Prisma.Args<(typeof prismadb)[T], 'findMany'>['where'];
 }
 
-type ExtractSelectField<T> = T extends { select: infer S } ? S : never;
+interface PaginatedQueryArgs<T extends DbModelsWithFindMany> extends DbSelectAndWhere<T> {
+	pagination?: {
+		page: number;
+		perPage: number;
+	};
+}
+
+type DbFindManyResult<
+	T extends DbModelsWithFindMany,
+	U extends DbSelectAndWhere<T>,
+> = Prisma.Result<(typeof prismadb)[T], U, 'findMany'>;
+
+// Function
+
+/**
+ * @param modelName - The name of the model to query
+ * @param args - The arguments to pass to the query
+ * @returns Promise[typeof args.select, number] - Tuple containing the data and the count of the query
+ * based on the select argument
+ * @example
+ * const [data, count] = await getPaginatedData('user', {
+ * 	select: {
+ * 		id: true,
+ * 		customers: {
+ * 			select: {
+ * 				firstName: true,
+ * 			},
+ * 		},
+ * 	},
+ * });
+ * console.log(data);
+ * console.log(count);
+ * 
+ */
 export const getPaginatedData = async <
-	T extends ModelsWithFindMany,
-	U extends FindManyArgs<T>,
+	T extends DbModelsWithFindMany,
+	U extends PaginatedQueryArgs<T>,
 >(
 	modelName: T,
-	findManyArgs: U,
-	pagination?: Pagination,
-) => {
-	const { page, perPage } = pagination || paginationConstants;
+	args: U,
+): Promise<[DbFindManyResult<T, U>, number]> => {
+	// Destructure args
+	const { pagination, select, where } = args;
 
+	// Pagination
+	const { page, perPage } = pagination || paginationConstants;
 	const skip = (page - 1) * perPage;
 	const take = perPage;
 
-	type SelectField = ExtractSelectField<U>;
-	type ReturnTypeWithoutSelect = ReturnType<PrismaClient[T]['findMany']>;
+	// DB Model
+	const dbModel: PrismaClient[T] = prismadb[modelName];
 
-	type ResolvedReturnTypeWithoutSelect =
-		ReturnTypeWithoutSelect extends Promise<Array<infer R>> ? R : never;
+	// Db Functions
+	const findMany = dbModel.findMany as (args: {
+		select?: typeof select;
+		where?: typeof where;
+		skip?: number;
+		take?: number;
+	}) => Promise<DbFindManyResult<T, U>>;
 
-	type ReturnTypeWithSelect = SelectField extends undefined
-		? ResolvedReturnTypeWithoutSelect
-		: {
-				[K in keyof SelectField]: SelectField[K] extends true
-					? K extends keyof ResolvedReturnTypeWithoutSelect
-						? ResolvedReturnTypeWithoutSelect[K]
-						: never
-					: never;
-		  };
-
+	// TODO: Fix this type
 	// @ts-expect-error
-	const count = prismadb[modelName].count({
-		where: findManyArgs?.where,
+	const count = dbModel.count({
+		where: args?.where,
 	});
 
-	const findMany = prismadb[modelName].findMany as (
-		args: U & { skip: number; take: number },
-	) => Promise<Array<ReturnTypeWithSelect>>;
-
 	return await Promise.all([
-		findMany({
-			...findManyArgs,
-			skip,
-			take,
-		}),
+		findMany({ select, where, skip, take }),
 		count,
 	]);
+};
+
+// Usage
+const test = async () => {
+	const [data, count] = await getPaginatedData('user', {
+		select: {
+			id: true,
+			customers: {
+				select: {
+					firstName: true,
+				},
+			},
+		},
+	});
+	console.log(data);
 };
